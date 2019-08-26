@@ -9,17 +9,23 @@ import (
 	"path"
 )
 
-func main() {
+func executeCommands() {
+
+	var (
+		user, _ = user.Current()
+		cmd     = exec.Command("clear")
+		out, _  = cmd.Output()
+
+		homeLinux = path.Join(string(user.HomeDir), "/linux")
+		getConfig = exec.Command("wget", "https://raw.githubusercontent.com/u-root/webboot/master/config-4.12.7")
+
+		Config, _ = getConfig.Output()
+
+		buildecc = exec.Command("sudo", "apt-get", "install", "build-essential")
+	)
 
 	//get users home directory/name, and start all downloads under home/usr
-	user, _ := user.Current()
-	cmd := exec.Command("clear")
 	os.Chdir(string(user.HomeDir))
-	out, err := cmd.Output()
-
-	if err != nil {
-		log.Fatalf("Error changing directories %s", err)
-	}
 	fmt.Println(string(out))
 
 	//list all commands
@@ -39,29 +45,14 @@ func main() {
 	}
 
 	//set download location of config to linux
-	homeLinux := path.Join(string(user.HomeDir), "/linux")
-	getConfig := exec.Command("wget", "https://raw.githubusercontent.com/u-root/webboot/master/config-4.12.7")
 	os.Chdir(homeLinux)
-	Config, err := getConfig.Output()
-	fmt.Println(string(Config))
-	if err != nil {
-		log.Fatalf("Error getting config file %s", err)
-	}
-	fmt.Println(string(out))
+	fmt.Println(string(out), string(Config))
+	buildecc.CombinedOutput()
 
-	getbzImage := exec.Command("wget", "https://github.com/bjakobson/webboot-practice/blob/master/bzImage")
-	os.Chdir(homeLinux)
-	bzImage, err := getbzImage.Output()
-	fmt.Println(string(bzImage))
-	if err != nil {
-		log.Fatalf("Error getting bzImage file %s", err)
-	}
+}
 
-	file := exec.Command("go", "run", ".")
-	runFiles, _ := file.CombinedOutput()
-
-	fmt.Println(runFiles)
-
+func main() {
+	executeCommands()
 	fmt.Println("Succsesfully downloaded and stored all files!")
 
 }
