@@ -9,10 +9,10 @@ import (
 	"path"
 )
 
-//get absolute path
 func main() {
+
+	//get users home directory/name, and start all downloads under home/usr
 	user, _ := user.Current()
-	//start under the home directory
 	cmd := exec.Command("clear")
 	os.Chdir(string(user.HomeDir))
 	out, err := cmd.Output()
@@ -21,6 +21,7 @@ func main() {
 		log.Fatalf("Error changing directories %s", err)
 	}
 	fmt.Println(string(out))
+
 	//list all commands
 	var commands = [][]string{
 		{"go", "get", "github.com/u-root/webboot"},
@@ -28,7 +29,6 @@ func main() {
 		{"git", "clone", "--depth", "1", "-b", "v4.12.7", "git://git.kernel.org/pub/scm/linux/kernel/git/stable/linux.git", "linux"},
 		{"git", "clone", "git://git.kernel.org/pub/scm/linux/kernel/git/iwlwifi/linux-firmware.git"},
 	}
-
 	//convert [][]string to string, and execute the commands
 	for _, cmd := range commands {
 		c := exec.Command(cmd[0], cmd[1:]...)
@@ -38,15 +38,12 @@ func main() {
 
 	}
 
+	//set download location of config to linux
 	homeLinux := path.Join(string(user.HomeDir), "/linux")
-	//fmt.Println(homeLinux)
-
 	getConfig := exec.Command("wget", "https://raw.githubusercontent.com/u-root/webboot/master/config-4.12.7")
 	os.Chdir(homeLinux)
 	Config, err := getConfig.Output()
-
 	fmt.Println(string(Config))
-
 	if err != nil {
 		log.Fatalf("Error getting config file %s", err)
 	}
