@@ -42,12 +42,16 @@ func executeCommands() {
 	}
 
 	//set download location of config to linux
+	buildecc.CombinedOutput()
 	os.Chdir(homeLinux)
 	getConfig := exec.Command("wget", "https://raw.githubusercontent.com/u-root/webboot/master/config-4.12.7")
 	Config, _ := getConfig.Output()
-	fmt.Println(string(out), string(Config))
+	conf := exec.Command("cp", "config-4.12.7", ".config")
+	conf.CombinedOutput()
+	makebzImage := exec.Command("make", "bzImage")
+	makebzImage.CombinedOutput()
 
-	buildecc.CombinedOutput()
+	fmt.Println(string(out), string(Config))
 
 }
 
