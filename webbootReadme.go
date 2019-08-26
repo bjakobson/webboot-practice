@@ -24,7 +24,7 @@ func executeCommands() {
 		buildecc = exec.Command("sudo", "apt-get", "install", "build-essential")
 	)
 
-	//get users home directory/name, and start all downloads under home/usr
+	//get users home directory/name, and start all downloads under home/user
 	os.Chdir(string(user.HomeDir))
 	fmt.Println(string(out))
 
