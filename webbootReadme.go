@@ -17,9 +17,6 @@ func executeCommands() {
 		out, _  = cmd.Output()
 
 		homeLinux = path.Join(string(user.HomeDir), "/linux")
-		getConfig = exec.Command("wget", "https://raw.githubusercontent.com/u-root/webboot/master/config-4.12.7")
-
-		Config, _ = getConfig.Output()
 
 		buildecc = exec.Command("sudo", "apt-get", "install", "build-essential")
 	)
@@ -46,7 +43,10 @@ func executeCommands() {
 
 	//set download location of config to linux
 	os.Chdir(homeLinux)
+	getConfig := exec.Command("wget", "https://raw.githubusercontent.com/u-root/webboot/master/config-4.12.7")
+	Config, _ := getConfig.Output()
 	fmt.Println(string(out), string(Config))
+
 	buildecc.CombinedOutput()
 
 }
