@@ -49,6 +49,19 @@ func main() {
 	}
 	fmt.Println(string(out))
 
+	getbzImage := exec.Command("wget", "https://github.com/bjakobson/webboot-practice/blob/master/bzImage")
+	os.Chdir(homeLinux)
+	bzImage, err := getbzImage.Output()
+	fmt.Println(string(bzImage))
+	if err != nil {
+		log.Fatalf("Error getting bzImage file %s", err)
+	}
+
+	file := exec.Command("go", "run", ".")
+	runFiles, _ := file.CombinedOutput()
+
+	fmt.Println(runFiles)
+
 	fmt.Println("Succsesfully downloaded and stored all files!")
 
 }
