@@ -38,7 +38,7 @@ func executeCommands() {
 		{"make", "bzImage"},
 	}
 
-	//execute pre
+	//pre install (execute pre)
 	for _, cmd := range commandsPre {
 		c := exec.Command(cmd[0], cmd[1:]...)
 		if err := c.Run(); err != nil {
