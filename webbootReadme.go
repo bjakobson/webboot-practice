@@ -68,7 +68,7 @@ func executeCommands() {
 	}
 
 }
-
+ 
 func main() {
 	executeCommands()
 	fmt.Println("Succsesfully downloaded and stored all files!")
