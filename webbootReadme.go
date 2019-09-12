@@ -12,28 +12,34 @@ import (
 func executeCommands() {
 
 	var (
-		user, _ = user.Current()
-		cmd     = exec.Command("clear")
-		out, _  = cmd.Output()
-
+		user, _   = user.Current()
+		home      = string(user.HomeDir)
 		homeLinux = path.Join(string(user.HomeDir), "/linux")
-
-		buildecc = exec.Command("sudo", "apt-get", "install", "build-essential")
 	)
 
-	//get users home directory/name, and start all downloads under home/user
-	os.Chdir(string(user.HomeDir))
-	fmt.Println(string(out))
+	//pre install
+	var commandsPre = [][]string{
+		{"sudo", "apt-get", "install", "build-essential"},
+	}
 
-	//list all commands
-	var commands = [][]string{
+	//under home dir
+	os.Chdir(home)
+	var commandsHome = [][]string{
 		{"go", "get", "github.com/u-root/webboot"},
 		{"sudo", "apt", "install", "libssl-dev"},
 		{"git", "clone", "--depth", "1", "-b", "v4.12.7", "git://git.kernel.org/pub/scm/linux/kernel/git/stable/linux.git", "linux"},
 		{"git", "clone", "git://git.kernel.org/pub/scm/linux/kernel/git/iwlwifi/linux-firmware.git"},
 	}
-	//convert [][]string to string, and execute the commands
-	for _, cmd := range commands {
+
+	//under 'linux'
+	var commandsLinux = [][]string{
+		{"wget", "https://raw.githubusercontent.com/u-root/webboot/master/config-4.12.7"},
+		{"cp", "config-4.12.7", ".config"},
+		{"make", "bzImage"},
+	}
+
+	//execute pre
+	for _, cmd := range commandsPre {
 		c := exec.Command(cmd[0], cmd[1:]...)
 		if err := c.Run(); err != nil {
 			log.Fatalf("%s failed: %v", cmd, err)
@@ -41,17 +47,25 @@ func executeCommands() {
 
 	}
 
-	//set download location of config to linux
-	buildecc.CombinedOutput()
-	os.Chdir(homeLinux)
-	getConfig := exec.Command("wget", "https://raw.githubusercontent.com/u-root/webboot/master/config-4.12.7")
-	Config, _ := getConfig.Output()
-	conf := exec.Command("cp", "config-4.12.7", ".config")
-	conf.CombinedOutput()
-	makebzImage := exec.Command("make", "bzImage")
-	makebzImage.CombinedOutput()
+	fmt.Println("Downloading and storing files...")
 
-	fmt.Println(string(out), string(Config))
+	//execute home
+	for _, cmd := range commandsHome {
+		c := exec.Command(cmd[0], cmd[1:]...)
+		if err := c.Run(); err != nil {
+			log.Fatalf("%s failed: %v", cmd, err)
+		}
+
+	}
+
+	os.Chdir(homeLinux)
+	for _, cmd := range commandsLinux {
+		c := exec.Command(cmd[0], cmd[1:]...)
+		if err := c.Run(); err != nil {
+			log.Fatalf("%s failed: %v", cmd, err)
+		}
+
+	}
 
 }
 
