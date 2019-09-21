@@ -2,4 +2,10 @@ A temporary location for files to be uploaded, reviewed, or updated before pushi
 
 sudo apt install build-essential 
 
-git clone 
+git clone https://github.com/bjakobson/webboot-practice.git
+
+cd $GOPATH/src/webboot-practice
+
+go run .
+
+
