@@ -17,11 +17,6 @@ func executeCommands() {
 		homeLinux = path.Join(string(user.HomeDir), "/linux")
 	)
 
-	//pre install
-	var commandsPre = [][]string{
-		{"sudo", "apt-get", "install", "build-essential"},
-	}
-
 	//under home dir
 	os.Chdir(home)
 	var commandsHome = [][]string{
@@ -36,15 +31,6 @@ func executeCommands() {
 		{"wget", "https://raw.githubusercontent.com/u-root/webboot/master/config-4.12.7"},
 		{"cp", "config-4.12.7", ".config"},
 		{"make", "bzImage"},
-	}
-
-	//pre install (execute pre)
-	for _, cmd := range commandsPre {
-		c := exec.Command(cmd[0], cmd[1:]...)
-		if err := c.Run(); err != nil {
-			log.Fatalf("%s failed: %v", cmd, err)
-		}
-
 	}
 
 	fmt.Println("Downloading and storing files...")
@@ -67,8 +53,8 @@ func executeCommands() {
 
 	}
 
-} 
- 
+}
+
 func main() {
 	executeCommands()
 	fmt.Println("Succsesfully downloaded and stored all files!")
