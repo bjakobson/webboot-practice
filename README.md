@@ -4,10 +4,13 @@ sudo apt install libssl-dev
 
 1. sudo apt install build-essential
 
-  -git clone https://github.com/bjakobson/webboot-practice.git
 
-  -cd $GOPATH/src/webboot-practice
+    -git clone https://github.com/bjakobson/webboot-practice.git
 
-  -go run .
+
+    -cd $GOPATH/src/webboot-practice
+
+
+    -go run .
 
 
