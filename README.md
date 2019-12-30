@@ -1,11 +1,16 @@
-A temporary location for files to be uploaded, reviewed, or updated before pushing the final product out to the main repository.
+A temporary location for files to be uploaded, reviewed, or updated before pushing the final product out to the main repository
 
-**sudo apt install build-essential**
+sudo apt install libssl-dev
 
-**git clone https://github.com/bjakobson/webboot-practice.git**
+1. sudo apt install build-essential
 
-**cd $GOPATH/src/webboot-practice**
 
-**go run .**
+    -git clone https://github.com/bjakobson/webboot-practice.git
+
+
+    -cd $GOPATH/src/webboot-practice
+
+
+    -go run .
 
 
