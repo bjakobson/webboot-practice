@@ -22,6 +22,7 @@ func executeCommands() {
 	var commandsHome = [][]string{
 		{"go", "get", "github.com/u-root/webboot"},
 		{"sudo", "apt", "install", "libssl-dev"},
+		{"sudo", "apt", "install", "libssl-dev", "build-essential"},
 		{"git", "clone", "--depth", "1", "-b", "v4.12.7", "git://git.kernel.org/pub/scm/linux/kernel/git/stable/linux.git", "linux"},
 		{"git", "clone", "git://git.kernel.org/pub/scm/linux/kernel/git/iwlwifi/linux-firmware.git"},
 	}
