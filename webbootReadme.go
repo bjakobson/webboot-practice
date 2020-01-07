@@ -38,6 +38,7 @@ func executeCommands() {
 	//execute home
 	for _, cmd := range commandsHome {
 		c := exec.Command(cmd[0], cmd[1:]...)
+		c.Stdout, c.Stderr = os.Stdout, os.Stderr
 		if err := c.Run(); err != nil {
 			log.Fatalf("%s failed: %v", cmd, err)
 		}
@@ -47,6 +48,7 @@ func executeCommands() {
 	os.Chdir(homeLinux)
 	for _, cmd := range commandsLinux {
 		c := exec.Command(cmd[0], cmd[1:]...)
+		c.Stdout, c.Stderr = os.Stdout, os.Stderr
 		if err := c.Run(); err != nil {
 			log.Fatalf("%s failed: %v", cmd, err)
 		}
