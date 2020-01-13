@@ -13,8 +13,8 @@ import (
 )
 
 func main() {
-	executeCommands()
-	Webboot()
+	//executeCommands()
+	//Webboot()
 
 	//making sure syslinux isn't already downloaded
 	if fileExists("/home/brandonjakobson/Downloads/syslinux-6.04-pre1.tar.gz") {
