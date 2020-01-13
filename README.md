@@ -1,6 +1,11 @@
 A Webboot widget in order to download Webboot's files, non-modular kernel, build initramfs, and build a bootable USB that work's on hardware and software.
 
 
+
+
+
+
+
  **PREREQUISTIES**
  
      -Go is setup
