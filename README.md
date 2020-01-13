@@ -1,16 +1,8 @@
-A temporary location for files to be uploaded, reviewed, or updated before pushing the final product out to the main repository
+A Webboot widget in order to download Webboot's files, non-modular kernel, build initramfs, and build a bootable USB thar work's on hardware and software.
 
-sudo apt install libssl-dev
+** prerequisite **
 
-1. sudo apt install build-essential
+go get github.com/bjakobson/webboot-practice
 
-
-    -git clone https://github.com/bjakobson/webboot-practice.git
-
-
-    -cd $GOPATH/src/webboot-practice
-
-
-    -go run .
-
-
+cd $GOPATH/src/webboot-practice
+go run .
