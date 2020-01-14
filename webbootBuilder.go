@@ -42,8 +42,8 @@ func Device() bool {
 }
 
 func main() {
-	//executeCommands()
-	//Webboot()
+	executeCommands()
+	Webboot()
 
 	Device()
 	//making sure syslinux isn't already downloaded
