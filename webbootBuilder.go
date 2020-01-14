@@ -12,16 +12,48 @@ import (
 	"strings"
 )
 
+var (
+	devB       = "/dev/sdb"
+	devBSTATUS = false
+	devC       = "/dev/sdc"
+	devCSTATUS = false
+	devD       = "/dev/sdd"
+	devDSTATUS = false
+)
+
+func Device() bool {
+	if fileExists(devB) {
+		fmt.Println("Found /dev/sdb")
+		devBSTATUS = true
+	} else if fileExists(devC) {
+		fmt.Println("found /dev/sdc")
+		devCSTATUS = true
+	} else if fileExists(devD) {
+		fmt.Println("found /dev/sdd")
+		devDSTATUS = true
+
+	} else {
+		log.Fatalf("Please insert a USB")
+	}
+
+	return devBSTATUS
+	return devCSTATUS
+	return devDSTATUS
+}
+
 func main() {
 	//executeCommands()
 	//Webboot()
 
+	Device()
 	//making sure syslinux isn't already downloaded
 	if fileExists("/home/brandonjakobson/Downloads/syslinux-6.04-pre1.tar.gz") {
 		fmt.Println("Syslinux exists, not downloading")
 	} else {
 		DownloadFile(os.Chdir(filepath.Join(homeDir, "/Downloads")))
 	}
+
+	Init()
 
 	DeletePartition(os.Chdir(homeDir))
 
@@ -183,19 +215,31 @@ func Webboot() {
 	debug("done")
 }
 
+var name string
+
+func Init() {
+	if devBSTATUS == true {
+		name = "/dev/sdb"
+	} else if devCSTATUS == true {
+		name = "/dev/sdc"
+	} else if devDSTATUS == true {
+		name = "/dev/sdd"
+	} else {
+		fmt.Println()
+	}
+	fmt.Println(name)
+}
+
 //building usb
 func DeletePartition(path error) {
 	var command = [][]string{
-		{"sudo", "fdisk", "/dev/sdb"},
-		{"sudo", "fdisk", "/dev/sdc"},
-		{"sudo", "fdisk", "/dev/sdd"},
 
-		{"sudo", "fdisk", "/dev/sdb1"},
-		{"sudo", "fdisk", "/dev/sdc1"},
-		{"sudo", "fdisk", "/dev/sdd1"},
+		{"sudo", "umount", name},
+
+		{"sudo", "fdisk", "/dev/sdc"},
 
 		{"echo", "d"},
-		{"echo", "1"},
+		//{"echo", "1"},
 		{"echo", "w"},
 	}
 
@@ -208,39 +252,22 @@ func DeletePartition(path error) {
 		}
 
 	}
+
 }
 
 func MakePartition(path error) {
 	var command = [][]string{
 		{"pwd"},
 		//{"sudo", "dd", "if=/dev/zero", "of=/dev/sdb", "bs=4k"},
-		{"sudo", "fdisk", "/dev/sdb"},
-		{"sudo", "fdisk", "/dev/sdc"},
-		{"sudo", "fdisk", "/dev/sdd"},
-
-		{"sudo", "fdisk", "/dev/sdb1"},
-		{"sudo", "fdisk", "/dev/sdc1"},
-		{"sudo", "fdisk", "/dev/sdd1"},
+		{"sudo", "fdisk", name},
 
 		{"echo", "n"},
 		{"echo", "p"},
 		{"echo", "w"},
 
-		{"sudo", "mkfs.vfat", "/dev/sdb"},
-		{"sudo", "mkfs.vfat", "/dev/sdc"},
-		{"sudo", "mkfs.vfat", "/dev/sdd"},
+		{"sudo", "mkfs.vfat", "-I", name},
 
-		{"sudo", "mkfs.vfat", "/dev/sdb1"},
-		{"sudo", "mkfs.vfat", "/dev/sdc1"},
-		{"sudo", "mkfs.vfat", "/dev/sdd1"},
-
-		{"sudo", "mount", "-o", "remount,rw", "/dev/sdb", usb},
-		{"sudo", "mount", "-o", "remount,rw", "/dev/sdc", usb},
-		{"sudo", "mount", "-o", "remount,rw", "/dev/sdd", usb},
-
-		{"sudo", "mount", "-o", "remount,rw", "/dev/sdb1", usb},
-		{"sudo", "mount", "-o", "remount,rw", "/dev/sdc1", usb},
-		{"sudo", "mount", "-o", "remount,rw", "/dev/sdd1", usb},
+		{"sudo", "mount", "-o", "remount,rw", name, usb},
 	}
 
 	for _, cmd := range command {
@@ -252,6 +279,8 @@ func MakePartition(path error) {
 		}
 
 	}
+
+	os.Exit(0)
 }
 
 func DownloadFile(path error) {
@@ -279,13 +308,7 @@ func DownloadFile(path error) {
 func Mount(path error) {
 	var command = [][]string{
 		{"sudo", "mkdir", "USB"},
-		{"sudo", "mount", "/dev/sdb", "USB"},
-		{"sudo", "mount", "/dev/sdc", "USB"},
-		{"sudo", "mount", "/dev/sdd", "USB"},
-
-		{"sudo", "mount", "/dev/sdb1", "USB"},
-		{"sudo", "mount", "/dev/sdc1", "USB"},
-		{"sudo", "mount", "/dev/sdd1", "USB"},
+		{"sudo", "mount", name, "USB"},
 	}
 
 	for _, cmd := range command {
@@ -301,13 +324,7 @@ func Mount(path error) {
 
 func activate(path error) {
 	var command = [][]string{
-		{"sudo", "./syslinux", "-i", "/dev/sdb"},
-		{"sudo", "./syslinux", "-i", "/dev/sdc"},
-		{"sudo", "./syslinux", "-i", "/dev/sdd"},
-
-		{"sudo", "./syslinux", "-i", "/dev/sdb1"},
-		{"sudo", "./syslinux", "-i", "/dev/sdc1"},
-		{"sudo", "./syslinux", "-i", "/dev/sdd1"},
+		{"sudo", "./syslinux", "-i", name},
 	}
 
 	for _, cmd := range command {
@@ -374,8 +391,6 @@ func dd(path error) {
 	var command = [][]string{
 		{"pwd"},
 		{"sudo", "dd", "bs=440", "count=1", "conv=notrunc", "if=mbr.bin", "of=/dev/sdb"},
-		{"sudo", "dd", "bs=440", "count=1", "conv=notrunc", "if=mbr.bin", "of=/dev/sdc"},
-		{"sudo", "dd", "bs=440", "count=1", "conv=notrunc", "if=mbr.bin", "of=/dev/sdd"},
 	}
 	for _, cmd := range command {
 		c := exec.Command(cmd[0], cmd[1:]...)
