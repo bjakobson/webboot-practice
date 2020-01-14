@@ -280,7 +280,6 @@ func MakePartition(path error) {
 
 	}
 
-	os.Exit(0)
 }
 
 func DownloadFile(path error) {
