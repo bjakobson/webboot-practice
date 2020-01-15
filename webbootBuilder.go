@@ -14,27 +14,60 @@ import (
 
 var (
 	devB       = "/dev/sdb"
+	devB1      = "/dev/sdb1"
 	devBSTATUS = false
+
 	devC       = "/dev/sdc"
 	devCSTATUS = false
+	devC1      = "/dev/sdc1"
+
 	devD       = "/dev/sdd"
+	devD1      = "/dev/sdD1"
 	devDSTATUS = false
+
+	noUSB = true
 )
 
-func Device() bool {
-	if fileExists(devB) {
-		fmt.Println("Found /dev/sdb")
-		devBSTATUS = true
-	} else if fileExists(devC) {
-		fmt.Println("found /dev/sdc")
-		devCSTATUS = true
-	} else if fileExists(devD) {
-		fmt.Println("found /dev/sdd")
-		devDSTATUS = true
+// check what device exists
 
-	} else {
-		log.Fatalf("Please insert a USB")
+// this way we arent trying every possible device in future uses
+
+// typical error message would return "permission denied"
+//if it find /dev/sdX, so i can render the error message as a boolean
+func Device() bool {
+
+	b, err := os.Open("/dev/sdb")
+	if strings.Contains(err.Error(), "permission denied") {
+		devBSTATUS = true
+		noUSB = false
+	} else if !strings.Contains(err.Error(), "no such file or directory") {
+		devBSTATUS = false
 	}
+
+	c, err := os.Open("/dev/sdc")
+	if strings.Contains(err.Error(), "permission denied") {
+
+		devCSTATUS = true
+		noUSB = false
+	} else if !strings.Contains(err.Error(), "no such file or directory") {
+		devCSTATUS = false
+	}
+
+	d, err := os.Open("/dev/sdd")
+	if strings.Contains(err.Error(), "permission denied") {
+
+		devDSTATUS = true
+		noUSB = false
+	} else if !strings.Contains(err.Error(), "no such file or directory") {
+		devDSTATUS = false
+	}
+
+	if noUSB == true {
+		log.Fatal("No USB deteced, please insert a USB stick")
+	}
+	_ = b
+	_ = c
+	_ = d
 
 	return devBSTATUS
 	return devCSTATUS
@@ -43,10 +76,13 @@ func Device() bool {
 
 func main() {
 	//executeCommands()
-	//Webboot()
+	Webboot()
 
 	Device()
+
+	fmt.Println("devB:", devBSTATUS, "\n devC:", devCSTATUS, "\n devD:", devDSTATUS)
 	//making sure syslinux isn't already downloaded
+
 	if fileExists("/home/brandonjakobson/Downloads/syslinux-6.04-pre1.tar.gz") {
 		fmt.Println("Syslinux exists, not downloading")
 	} else {
@@ -216,18 +252,27 @@ func Webboot() {
 }
 
 var name string
+var name1 string
+var mkp string
 
 func Init() {
 	if devBSTATUS == true {
 		name = "/dev/sdb"
+		name1 = devB1
+		mkp = "echo 'type=83' | sudo sfdisk /dev/sdb \n sudo mkfs -t vfat /dev/sdb1"
 	} else if devCSTATUS == true {
 		name = "/dev/sdc"
+		name1 = devC1
+		mkp = "echo 'type=83' | sudo sfdisk /dev/sdc \n sudo mkfs -t vfat /dev/sdc1"
+
 	} else if devDSTATUS == true {
 		name = "/dev/sdd"
+		name1 = devD1
+		mkp = "echo 'type=83' | sudo sfdisk /dev/sdd \n sudo mkfs -t vfat /dev/sdd1"
+
 	} else {
 		fmt.Println()
 	}
-	fmt.Println(name)
 }
 
 //building usb
@@ -236,11 +281,11 @@ func DeletePartition(path error) {
 
 		{"sudo", "umount", name},
 
-		{"sudo", "fdisk", "/dev/sdc"},
+		//{"sudo", "fdisk", "/dev/sdb"},
 
-		{"echo", "d"},
+		//{"echo", "d"},
 		//{"echo", "1"},
-		{"echo", "w"},
+		//{"echo", "w"},
 	}
 
 	for _, cmd := range command {
@@ -252,22 +297,26 @@ func DeletePartition(path error) {
 		}
 
 	}
-
+	//os.Exit(0)
 }
 
 func MakePartition(path error) {
+	f, err := os.Create("makePartition.sh")
+	if err != nil {
+		fmt.Println(err)
+		return
+	}
+	l, err := f.WriteString(mkp)
+	if err != nil {
+		fmt.Println(err)
+		f.Close()
+		return
+	}
+	fmt.Println(l)
+	f.Close()
 	var command = [][]string{
 		{"pwd"},
-		//{"sudo", "dd", "if=/dev/zero", "of=/dev/sdb", "bs=4k"},
-		{"sudo", "fdisk", name},
-
-		{"echo", "n"},
-		{"echo", "p"},
-		{"echo", "w"},
-
-		{"sudo", "mkfs.vfat", "-I", name},
-
-		{"sudo", "mount", "-o", "remount,rw", name, usb},
+		{"sudo", "bash", "./makePartition.sh"},
 	}
 
 	for _, cmd := range command {
@@ -279,8 +328,6 @@ func MakePartition(path error) {
 		}
 
 	}
-
-	os.Exit(0)
 }
 
 func DownloadFile(path error) {
@@ -289,8 +336,7 @@ func DownloadFile(path error) {
 		{"sudo", "apt-get", "install", "mtools"},
 		{"sudo", "apt-get", "install", "libc6-i386"},
 		{"echo", "Y"},
-		{"sudo", "apt-get", "install", "wget"},
-		{"echo", "Y"},
+
 		{"wget", "https://mirrors.edge.kernel.org/pub/linux/utils/boot/syslinux/Testing/6.04/syslinux-6.04-pre1.tar.gz"},
 		{"sudo", "tar", "-xzf", "syslinux-6.04-pre1.tar.gz"},
 	}
@@ -308,7 +354,7 @@ func DownloadFile(path error) {
 func Mount(path error) {
 	var command = [][]string{
 		{"sudo", "mkdir", "USB"},
-		{"sudo", "mount", name, "USB"},
+		{"sudo", "mount", name1, "USB"},
 	}
 
 	for _, cmd := range command {
@@ -324,7 +370,7 @@ func Mount(path error) {
 
 func activate(path error) {
 	var command = [][]string{
-		{"sudo", "./syslinux", "-i", name},
+		{"sudo", "./syslinux", "-i", name1},
 	}
 
 	for _, cmd := range command {
