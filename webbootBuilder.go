@@ -75,7 +75,11 @@ func Device() bool {
 }
 
 func main() {
+<<<<<<< HEAD
 	//executeCommands()
+=======
+	executeCommands()
+>>>>>>> 83508cf0668fc41f47d0f32d1e2a759099b3e3c1
 	Webboot()
 
 	Device()
@@ -328,6 +332,10 @@ func MakePartition(path error) {
 		}
 
 	}
+<<<<<<< HEAD
+=======
+
+>>>>>>> 83508cf0668fc41f47d0f32d1e2a759099b3e3c1
 }
 
 func DownloadFile(path error) {
