@@ -75,11 +75,7 @@ func Device() bool {
 }
 
 func main() {
-<<<<<<< HEAD
 	//executeCommands()
-=======
-	executeCommands()
->>>>>>> 83508cf0668fc41f47d0f32d1e2a759099b3e3c1
 	Webboot()
 
 	Device()
@@ -258,20 +254,25 @@ func Webboot() {
 var name string
 var name1 string
 var mkp string
+var of string
 
 func Init() {
 	if devBSTATUS == true {
 		name = "/dev/sdb"
 		name1 = devB1
 		mkp = "echo 'type=83' | sudo sfdisk /dev/sdb \n sudo mkfs -t vfat /dev/sdb1"
+		of = "of=/dev/sdb"
 	} else if devCSTATUS == true {
 		name = "/dev/sdc"
 		name1 = devC1
 		mkp = "echo 'type=83' | sudo sfdisk /dev/sdc \n sudo mkfs -t vfat /dev/sdc1"
+		of = "of=/dev/sdc"
 
 	} else if devDSTATUS == true {
 		name = "/dev/sdd"
 		name1 = devD1
+		of = "of=/dev/sdd"
+
 		mkp = "echo 'type=83' | sudo sfdisk /dev/sdd \n sudo mkfs -t vfat /dev/sdd1"
 
 	} else {
@@ -332,10 +333,6 @@ func MakePartition(path error) {
 		}
 
 	}
-<<<<<<< HEAD
-=======
-
->>>>>>> 83508cf0668fc41f47d0f32d1e2a759099b3e3c1
 }
 
 func DownloadFile(path error) {
@@ -444,7 +441,8 @@ func kernelInitramfs(path error) {
 func dd(path error) {
 	var command = [][]string{
 		{"pwd"},
-		{"sudo", "dd", "bs=440", "count=1", "conv=notrunc", "if=mbr.bin", "of=/dev/sdb"},
+		{"sudo", "dd", "bs=440", "count=1", "conv=notrunc", "if=mbr.bin", of},
+		{"sudo", "parted", name, "set", "1", "boot", "on"},
 	}
 	for _, cmd := range command {
 		c := exec.Command(cmd[0], cmd[1:]...)
